@@ -1,7 +1,7 @@
-1. Para compilar el proyecto usa siguiente comando
-   mvn compile
-2. Para ejecutar el proyecto usa el siguiente comando
-   mvn spring-boot:run
+1. Para compilar el proyecto usa siguiente comando:
+   `mvn compile`
+2. Para ejecutar el proyecto usa el siguiente comando:
+   `mvn spring-boot:run`
    
 * Para crear usuarios en el sistema debes hacer un llamado POST al endpoint
   http://localhost:8080/user
