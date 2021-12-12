@@ -3,7 +3,6 @@ package com.nisum.ApiRest.controllers;
 import com.nisum.ApiRest.domain.CreateUserRequest;
 import com.nisum.ApiRest.domain.CreateUserResponse;
 import com.nisum.ApiRest.entities.User;
-import com.nisum.ApiRest.exceptions.ApiError;
 import com.nisum.ApiRest.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,11 +36,18 @@ public class UserController {
         }
 
         User created = userService.addUser(body.toUserEntity());
-        Iterable<User> users = userService.getUsers();
         return new ResponseEntity<>(new CreateUserResponse(created), HttpStatus.CREATED);
     }
 
     private void validateRequest(CreateUserRequest body) throws Exception {
+        if(body.getEmail() == null){
+            throw new Exception("El email es un campo requerido");
+        }
+
+        if(body.getPassword() == null){
+            throw new Exception("La contraseña es un campo requerido");
+        }
+
         Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(body.getEmail());
         if(!matcher.find()){
