@@ -26,3 +26,5 @@ El primero es para el formato de email y el segundo para la contraseña.
 
 Para los valores iniciales se tomó un regex de ejemplo para el correo y para la contraseña el regex está validando 
 mínimo 7 caracteres y que contenga al menos un número.
+
+Este proyecto tiene configurado swagger, entra a la url `http://localhost:8080/swagger-ui.htm` para acceder a la interfaz
