@@ -8,7 +8,7 @@
 		<version>2.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.nisum</groupId>
+	<groupId>com.example</groupId>
 	<artifactId>ApiRest</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ApiRest</name>
