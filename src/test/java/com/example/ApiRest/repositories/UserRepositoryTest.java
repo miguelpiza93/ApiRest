@@ -24,10 +24,12 @@ public class UserRepositoryTest {
 
     @Before
     public void setUp() {
-        User user = new User();
-        user.setName("Juan Rodriguez");
-        user.setEmail("juan@rodriguez.org");
-        user.setPassword("hunter2");
+        User user = User.builder()
+                .firstname("Juan")
+                .lastname("Rodriguez")
+                .email("juan@rodriguez.org")
+                .password("hunter2")
+                .build();
         entityManager.persist(user);
         entityManager.flush();
     }
@@ -36,7 +38,7 @@ public class UserRepositoryTest {
     public void findByEmail() {
         String email = "juan@rodriguez.org";
         // when
-        User found = userRepository.findByEmail(email);
+        User found = userRepository.findByEmail(email).orElseThrow();
         // then
         assertThat(found.getEmail()).isEqualTo(email);
     }

@@ -6,6 +6,7 @@ import com.example.ApiRest.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -17,17 +18,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     public Iterable<User> findAll(){ return userRepository.findAll(); }
 
-    public UserRepository getUserRepository() {
-        return userRepository;
-    }
-
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 }

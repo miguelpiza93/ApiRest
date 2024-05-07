@@ -1,135 +1,62 @@
 package com.example.ApiRest.controllers;
 
-import com.example.ApiRest.domain.CreateUserRequest;
-import com.example.ApiRest.domain.PhoneRequest;
+import com.example.ApiRest.config.JwtService;
+import com.example.ApiRest.dto.GetUsersResponse;
 import com.example.ApiRest.entities.User;
 import com.example.ApiRest.services.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.Arrays;
+import java.util.List;
 
-@RunWith(SpringRunner.class)
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
+    @TestConfiguration
+    static class UserControllerTestContextConfiguration {
+        @Bean
+        public UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
+        public JwtService jwtService() {
+            return mock(JwtService.class);
+        }
+    }
+
     @Autowired
-    private MockMvc mvc;
-
-    @MockBean
-    private UserService service;
+    private UserService userService;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private UserController userController;
 
     @Test
-    public void createUserSuccessfully()
-            throws Exception {
-        when(service.addUser(Mockito.any(User.class))).thenAnswer(i -> i.getArguments()[0]);
-        CreateUserRequest userRequest = getCreateRequest();
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.active", is(true)));
+    public void getUsers() throws Exception {
+        // Given
+        List<User> userList = Arrays.asList(
+                User.builder().email("test@example.com").build(),
+                User.builder().email("test2@example.com").build()
+        );
+        when(userService.findAll()).thenReturn(userList);
+
+        // When
+        ResponseEntity<GetUsersResponse> responseEntity = userController.getUsers();
+
+        // Then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(responseEntity.getBody()).isInstanceOf(GetUsersResponse.class);
+        GetUsersResponse getUsersResponse = responseEntity.getBody();
+        assert getUsersResponse != null;
+        assertThat(getUsersResponse.getUsers()).hasSize(2);
     }
-
-    @Test
-    public void createUserEmailAlreadyExistsException()
-            throws Exception {
-        CreateUserRequest userRequest = getCreateRequest();
-
-        when(service.findUserByEmail(userRequest.getEmail())).thenReturn(userRequest.toUserEntity());
-
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje", is("El correo ya registrado")));
-    }
-
-    @Test
-    public void createUserEmailException()
-            throws Exception {
-        CreateUserRequest userRequest = getCreateRequest();
-        userRequest.setEmail(null);
-
-        when(service.findUserByEmail(userRequest.getEmail())).thenReturn(userRequest.toUserEntity());
-
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje", is("El email es un campo requerido")));
-    }
-
-    @Test
-    public void createUserEmailException2()
-            throws Exception {
-        CreateUserRequest userRequest = getCreateRequest();
-        userRequest.setPassword(null);
-
-        when(service.findUserByEmail(userRequest.getEmail())).thenReturn(userRequest.toUserEntity());
-
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje", is("La contraseña es un campo requerido")));
-    }
-
-    @Test
-    public void createUserEmailException3()
-            throws Exception {
-        CreateUserRequest userRequest = getCreateRequest();
-        userRequest.setPassword("123");
-
-        when(service.findUserByEmail(userRequest.getEmail())).thenReturn(userRequest.toUserEntity());
-
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje", is("La contraseña no cumple con los requerimientos")));
-    }
-
-    @Test
-    public void createUserEmailException4()
-            throws Exception {
-        CreateUserRequest userRequest = getCreateRequest();
-        userRequest.setEmail("correofalso.com");
-
-        when(service.findUserByEmail(userRequest.getEmail())).thenReturn(userRequest.toUserEntity());
-
-        mvc.perform(post("/user")
-                .content(objectMapper.writeValueAsString(userRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje", is("El correo no es válido")));
-    }
-
-    private CreateUserRequest getCreateRequest(){
-        CreateUserRequest userRequest = new CreateUserRequest();
-        userRequest.setName("Username");
-        userRequest.setEmail("user@domain.com");
-        userRequest.setPassword("password2");
-        PhoneRequest phone = new PhoneRequest();
-        phone.setCountry("country");
-        phone.setCityCode("code");
-        phone.setNumber("4535413");
-        userRequest.getPhones().add(phone);
-        return userRequest;
-    }
-
 }

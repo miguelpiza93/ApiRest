@@ -1,126 +1,78 @@
 package com.example.ApiRest.entities;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class User {
+@Table(name = "_user")
+public class User implements UserDetails {
 
-    public User(){
-        this.phones = new ArrayList<>();
-    }
+  @Id
+  @GeneratedValue
+  private Integer id;
+  private String firstname;
+  private String lastname;
+  private String email;
+  private String password;
 
-    @Id
-    @GeneratedValue
-    private UUID id;
-    private String name;
-    private String email;
-    private String password;
-    @OneToMany(mappedBy = "user")
-    private List<Phone> phones;
-    private boolean isActive = true;
-    private UUID token;
-    @CreationTimestamp
-    private Timestamp created;
-    @UpdateTimestamp
-    private Timestamp modified;
-    @CreationTimestamp
-    private Timestamp lastLogin;
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
-    public UUID getId() {
-        return id;
-    }
+  @OneToMany(mappedBy = "user")
+  private List<Token> tokens;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  @OneToMany(mappedBy = "user")
+  private List<Phone> phones;
 
-    public String getName() {
-        return name;
-    }
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return role.getAuthorities();
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  @Override
+  public String getPassword() {
+    return password;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  @Override
+  public String getUsername() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
 
-    public List<Phone> getPhones() {
-        return phones;
-    }
-
-    public void setPhones(List<Phone> phones) {
-        this.phones = phones;
-    }
-
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public Timestamp getCreated() {
-        return created;
-    }
-
-    public void setCreated(Timestamp created) {
-        this.created = created;
-    }
-
-    public Timestamp getModified() {
-        return modified;
-    }
-
-    public void setModified(Timestamp modified) {
-        this.modified = modified;
-    }
-
-    public Timestamp getLastLogin() {
-        return lastLogin;
-    }
-
-    public void setLastLogin(Timestamp lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public UUID getToken() {
-        return token;
-    }
-
-    public void setToken(UUID token) {
-        this.token = token;
-    }
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 }

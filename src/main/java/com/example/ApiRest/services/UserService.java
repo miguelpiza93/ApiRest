@@ -2,9 +2,11 @@ package com.example.ApiRest.services;
 
 import com.example.ApiRest.entities.User;
 
+import java.util.Optional;
+
 public interface UserService {
 
     User addUser(User user);
-    User findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
     Iterable<User> findAll();
 }

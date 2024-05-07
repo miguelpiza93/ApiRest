@@ -14,6 +14,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -36,14 +41,14 @@ public class UserServiceImplTest {
     @Before
     public void setUp() {
         User user = getUser();
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userRepository.save(Mockito.any(User.class))).thenAnswer(i -> i.getArguments()[0]);
     }
 
     @Test
     public void findUserTest() {
         String email = "user@domain.com";
-        User user = userService.findUserByEmail(email);
+        User user = userService.findUserByEmail(email).orElseThrow();
         Assert.assertEquals(user.getEmail(), email);
     }
 
@@ -54,10 +59,24 @@ public class UserServiceImplTest {
         Assert.assertEquals(user.getEmail(), userCreated.getEmail());
     }
 
-    private User getUser(){
-        User user = new User();
-        user.setName("Username");
-        user.setEmail("user@domain.com");
-        return user;
+    @Test
+    public void findAllTest() {
+        // Given
+        List<User> userList = List.of(getUser());
+        when(userRepository.findAll()).thenReturn(userList);
+
+        // When
+        Iterable<User> allUsers = userService.findAll();
+
+        // Then
+        assertThat(allUsers).isNotNull().hasSize(1);
+    }
+
+    private User getUser() {
+        return User.builder()
+                .firstname("Firstname")
+                .lastname("Lastname")
+                .email("user@domain.com")
+                .build();
     }
 }
