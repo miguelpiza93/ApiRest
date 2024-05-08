@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres-sql
+    image: postgres
+    environment:
+      POSTGRES_USER: api_app
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: apirest
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  api-rest:
+    container_name: api-rest
+    image: api-rest:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/apirest
+      SPRING_DATASOURCE_USERNAME: api_app
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
