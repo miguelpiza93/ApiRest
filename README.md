@@ -8,8 +8,6 @@ El primero es para el formato de email y el segundo para la contraseña.
 Para los valores iniciales se tomó un regex de ejemplo para el correo y para la contraseña el regex está validando 
 mínimo 7 caracteres y que contenga al menos un número.
 
-<!--  Este proyecto tiene configurado swagger, entra a la url http://localhost:8080/swagger-ui.html para acceder a la interfaz. -->
-
 ## Requisitos previos
 
 - Docker
@@ -34,9 +32,9 @@ mínimo 7 caracteres y que contenga al menos un número.
         "token": "token_generated"
     }
    ```
-6. Llama al endpoint http://localhost:8080/user configurando el Bearer Token en el encabezado de la solicitud y usando el token recibido en el paso anterior.
+6. Llama al endpoint http://localhost:8080/api/v1/user configurando el Bearer Token en el encabezado de la solicitud y usando el token recibido en el paso anterior.
 7. Para Destruir los contenedores puedes ejecutar: `docker-compose down -v`
-
+8. Este proyecto tiene configurado swagger, entra a la url http://localhost:8080/swagger-ui.html para acceder a la documentación de los otros endpoints. 
 
 ## Pasos para ejecutar la aplicación en local
 

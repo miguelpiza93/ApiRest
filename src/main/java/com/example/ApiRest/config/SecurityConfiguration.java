@@ -16,6 +16,13 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+    private static final String[] SWAGGER_PATHS = {
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/webjars/swagger-ui/**"
+    };
+
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
 
@@ -27,8 +34,9 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                    req.requestMatchers("/api/v1/auth/**").permitAll()
-                    .anyRequest().authenticated()
+                        req.requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers(SWAGGER_PATHS).permitAll()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
