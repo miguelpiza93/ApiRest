@@ -2,7 +2,6 @@ package com.example.ApiRest.entities;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;

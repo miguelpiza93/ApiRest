@@ -1,45 +1,55 @@
 package com.example.ApiRest.repositories;
 
+import com.example.ApiRest.entities.Role;
 import com.example.ApiRest.entities.User;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.annotation.DirtiesContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.*;
+
 @DataJpaTest
 public class UserRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
     private UserRepository userRepository;
 
-
-    @Before
-    public void setUp() {
+    @Test
+    @DirtiesContext
+    public void findByEmailUsingExistingEmail() {
+        // Arrange
         User user = User.builder()
-                .firstname("Juan")
-                .lastname("Rodriguez")
-                .email("juan@rodriguez.org")
-                .password("hunter2")
+                .firstname("John")
+                .lastname("Doe")
+                .email("john@example.com")
+                .password("password")
+                .role(Role.USER)
                 .build();
-        entityManager.persist(user);
-        entityManager.flush();
+        userRepository.save(user);
+
+        // Act
+        Optional<User> foundUserOptional = userRepository.findByEmail("john@example.com");
+
+        // Assert
+        assertTrue(foundUserOptional.isPresent());
+        User foundUser = foundUserOptional.get();
+        assertEquals("John", foundUser.getFirstname());
+        assertEquals("Doe", foundUser.getLastname());
+        assertEquals("john@example.com", foundUser.getEmail());
+        assertEquals("password", foundUser.getPassword());
+        assertEquals(Role.USER, foundUser.getRole());
     }
 
     @Test
-    public void findByEmail() {
-        String email = "juan@rodriguez.org";
-        // when
-        User found = userRepository.findByEmail(email).orElseThrow();
-        // then
-        assertThat(found.getEmail()).isEqualTo(email);
+    @DirtiesContext
+    public void findByEmailUsingNonExistingEmail() {
+        // Act
+        Optional<User> foundUserOptional = userRepository.findByEmail("nonexisting@example.com");
+
+        // Assert
+        assertFalse(foundUserOptional.isPresent());
     }
 }
