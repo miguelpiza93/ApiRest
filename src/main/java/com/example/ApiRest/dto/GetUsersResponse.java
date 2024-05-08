@@ -1,6 +1,5 @@
 package com.example.ApiRest.dto;
 
-import com.example.ApiRest.entities.Phone;
 import com.example.ApiRest.entities.User;
 import lombok.Data;
 

@@ -37,7 +37,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull WebRequest request) {
         ApiError apiError =
                 new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -46,7 +46,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             ConstraintViolationException ex, WebRequest request) {
         ApiError apiError =
                 new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -55,7 +55,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             MethodArgumentTypeMismatchException ex, WebRequest request) {
         ApiError apiError =
                 new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
@@ -66,7 +66,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         ApiError apiError = new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -77,14 +77,14 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         ApiError apiError = new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         ApiError apiError = new ApiError(ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
