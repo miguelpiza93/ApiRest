@@ -1,8 +1,7 @@
-package com.example.ApiRest.services.impl;
+package com.example.ApiRest.services.user;
 
 import com.example.ApiRest.repositories.UserRepository;
 import com.example.ApiRest.entities.User;
-import com.example.ApiRest.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

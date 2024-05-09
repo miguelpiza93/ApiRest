@@ -1,4 +1,4 @@
-package com.example.ApiRest.services;
+package com.example.ApiRest.services.user;
 
 import com.example.ApiRest.entities.User;
 

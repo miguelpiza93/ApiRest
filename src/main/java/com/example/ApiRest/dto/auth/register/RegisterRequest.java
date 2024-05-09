@@ -20,7 +20,7 @@ public class RegisterRequest {
     private String lastname;
     private String email;
     private String password;
-    private List<PhoneRequest> phones = new ArrayList<>();
+    private List<PhoneRequest> phones;
 
     public User toUserEntity() {
         User user = User.builder()
@@ -30,6 +30,10 @@ public class RegisterRequest {
                 .password(this.password)
                 .role(Role.USER)
                 .build();
+
+        if(this.phones == null){
+            this.phones = new ArrayList<>();
+        }
 
         List<Phone> phones = this.phones.stream()
                 .map(PhoneRequest::toPhoneEntity)

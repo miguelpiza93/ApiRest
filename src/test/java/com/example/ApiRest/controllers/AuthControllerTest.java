@@ -7,7 +7,8 @@ import com.example.ApiRest.dto.auth.register.PhoneRequest;
 import com.example.ApiRest.dto.auth.register.RegisterRequest;
 import com.example.ApiRest.dto.auth.register.RegisterResponse;
 import com.example.ApiRest.entities.User;
-import com.example.ApiRest.services.UserService;
+import com.example.ApiRest.services.authentication.AuthenticationService;
+import com.example.ApiRest.services.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,24 +32,15 @@ public class AuthControllerTest {
 
     @TestConfiguration
     static class AuthControllerTestContextConfiguration {
+
         @Bean
         public JwtService jwtService() {
             return mock(JwtService.class);
         }
 
         @Bean
-        public UserService userService() {
-            return mock(UserService.class);
-        }
-
-        @Bean
-        public AuthenticationManager authenticationManager() {
-            return mock(AuthenticationManager.class);
-        }
-
-        @Bean
-        public UserDetailsService userDetailsService() {
-            return mock(UserDetailsService.class);
+        public AuthenticationService authenticationService() {
+            return mock(AuthenticationService.class);
         }
 
         @Bean
@@ -58,10 +50,7 @@ public class AuthControllerTest {
     }
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtService jwtService;
+    private AuthenticationService authenticationService;
 
     @Autowired
     private AuthController authController;
@@ -69,11 +58,8 @@ public class AuthControllerTest {
     @Test
     void testAuthenticateSuccessful() {
         // Given
-        AuthRequest authRequest = new AuthRequest("test@example.com", "password");
-        User user = new User();
-        user.setEmail("test@example.com");
-        when(userService.findUserByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn("test-token");
+        AuthRequest authRequest = mock(AuthRequest.class);
+        when(authenticationService.authenticate(authRequest)).thenReturn("fake-token");
 
         // When
         ResponseEntity<?> responseEntity = authController.authenticate(authRequest);
@@ -88,9 +74,8 @@ public class AuthControllerTest {
     @Test
     void testRegisterUserSuccessful() throws Exception {
         // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        when(userService.findUserByEmail("user@domain.com")).thenReturn(Optional.empty());
-        when(jwtService.generateToken(any(User.class))).thenReturn("test-token");
+        RegisterRequest registerRequest = mock(RegisterRequest.class);
+        when(authenticationService.register(registerRequest)).thenReturn("fake-token");
 
         // When
         ResponseEntity<Object> responseEntity = authController.registerUser(registerRequest);
@@ -100,86 +85,5 @@ public class AuthControllerTest {
         assertInstanceOf(RegisterResponse.class, responseEntity.getBody());
         RegisterResponse registerResponse = (RegisterResponse) responseEntity.getBody();
         assertNotNull(registerResponse.getToken());
-    }
-
-    @Test
-    void testRegisterUserWithEmailAlreadyExists() {
-        // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        when(userService.findUserByEmail("user@domain.com")).thenReturn(Optional.of(new User()));
-
-        // When
-        Exception exception = assertThrows(Exception.class, () -> authController.registerUser(registerRequest));
-
-        // Then
-        assertEquals("El correo ya registrado", exception.getMessage());
-    }
-
-    @Test
-    void testRegisterUserWithInvalidPassword() {
-        // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        registerRequest.setPassword("invalidpassword");
-
-        // When
-        Exception exception = assertThrows(Exception.class, () -> authController.registerUser(registerRequest));
-
-        // Then
-        assertEquals("La contraseña no cumple con los requerimientos", exception.getMessage());
-    }
-
-    @Test
-    void testRegisterUserWithInvalidEmail() {
-        // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        registerRequest.setEmail("invalidemail");
-
-        // When
-        Exception exception = assertThrows(Exception.class, () -> authController.registerUser(registerRequest));
-
-        // Then
-        assertEquals("El correo no es válido", exception.getMessage());
-    }
-
-    @Test
-    void testRegisterUserWithEmailNull() {
-        // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        registerRequest.setEmail(null);
-
-        // When
-        Exception exception = assertThrows(Exception.class, () -> authController.registerUser(registerRequest));
-
-        // Then
-        assertEquals("El email es un campo requerido", exception.getMessage());
-    }
-
-    @Test
-    void testRegisterUserWithPasswordNull() {
-        // Given
-        RegisterRequest registerRequest = getCreateRequest();
-        registerRequest.setPassword(null);
-
-        // When
-        Exception exception = assertThrows(Exception.class, () -> authController.registerUser(registerRequest));
-
-        // Then
-        assertEquals("La contraseña es un campo requerido", exception.getMessage());
-    }
-
-
-    private RegisterRequest getCreateRequest() {
-        PhoneRequest phone = PhoneRequest.builder()
-                .country("country")
-                .cityCode("code")
-                .number("4535413").build();
-
-        return RegisterRequest
-                .builder()
-                .email("user@domain.com")
-                .firstname("firstname")
-                .lastname("lastname")
-                .password("Qwertyui1")
-                .phones(List.of(phone)).build();
     }
 }

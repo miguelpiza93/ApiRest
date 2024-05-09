@@ -2,7 +2,7 @@ package com.example.ApiRest.controllers;
 
 import com.example.ApiRest.dto.GetUsersResponse;
 import com.example.ApiRest.entities.User;
-import com.example.ApiRest.services.UserService;
+import com.example.ApiRest.services.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

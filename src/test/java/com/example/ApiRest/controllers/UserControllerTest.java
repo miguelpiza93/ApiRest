@@ -3,7 +3,7 @@ package com.example.ApiRest.controllers;
 import com.example.ApiRest.config.JwtService;
 import com.example.ApiRest.dto.GetUsersResponse;
 import com.example.ApiRest.entities.User;
-import com.example.ApiRest.services.UserService;
+import com.example.ApiRest.services.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
