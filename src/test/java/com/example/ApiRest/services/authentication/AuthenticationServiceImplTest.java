@@ -84,6 +84,71 @@ class AuthenticationServiceImplTest {
         assertEquals(token, expectedToken);
     }
 
+    @Test
+    public void registerWithExistingEmail() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setEmail("user@domain.com");
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("El correo ya está registrado", exception.getMessage());
+    }
+
+    @Test
+    public void registerWithInvalidEmail() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setEmail("invalid_email");
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("El correo no es válido", exception.getMessage());
+    }
+
+    @Test
+    public void registerWithInvalidPassword() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setPassword("123");
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("La contraseña no cumple con los requerimientos", exception.getMessage());
+    }
+
+    @Test
+    public void registerWithoutEmail() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setEmail(null);
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("El email es un campo requerido", exception.getMessage());
+    }
+
+    @Test
+    public void registerWithoutPassword() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setPassword(null);
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("La contraseña es un campo requerido", exception.getMessage());
+    }
+
     private RegisterRequest getRegisterRequest() {
         return RegisterRequest.builder()
                 .firstname("New")

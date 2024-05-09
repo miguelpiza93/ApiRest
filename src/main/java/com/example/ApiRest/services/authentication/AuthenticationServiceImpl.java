@@ -51,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         validateRequest(registerRequest);
         boolean found = this.userRepository.findByEmail(registerRequest.getEmail()).isPresent();
         if(found){
-            throw new Exception("El correo ya registrado");
+            throw new Exception("El correo ya está registrado");
         }
         User user = registerRequest.toUserEntity();
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
