@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(value = "/api/v1/user")
+@RestController
+@RequestMapping("/api/v1/user")
 @Tag(name = "Users")
 public class UserController {
 
@@ -21,6 +22,6 @@ public class UserController {
     @GetMapping
     public ResponseEntity<GetUsersResponse> getUsers() throws Exception {
         Iterable<User> users = userService.findAll();
-        return new ResponseEntity<>(new GetUsersResponse(users), HttpStatus.CREATED);
+        return new ResponseEntity<>(new GetUsersResponse(users), HttpStatus.OK);
     }
 }

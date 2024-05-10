@@ -1,62 +1,65 @@
 package com.example.ApiRest.controllers;
 
 import com.example.ApiRest.config.JwtService;
-import com.example.ApiRest.dto.GetUsersResponse;
+import com.example.ApiRest.entities.Role;
 import com.example.ApiRest.entities.User;
 import com.example.ApiRest.services.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTest {
 
-    @TestConfiguration
-    static class UserControllerTestContextConfiguration {
-        @Bean
-        public UserService userService() {
-            return mock(UserService.class);
-        }
-
-        @Bean
-        public JwtService jwtService() {
-            return mock(JwtService.class);
-        }
-    }
-
     @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private UserService userService;
 
+    @MockBean
+    private UserDetailsService userDetailsService;
+
     @Autowired
-    private UserController userController;
+    private JwtService jwtService;
+
 
     @Test
-    public void getUsers() throws Exception {
-        // Given
-        List<User> userList = Arrays.asList(
-                User.builder().email("test@example.com").build(),
-                User.builder().email("test2@example.com").build()
-        );
-        when(userService.findAll()).thenReturn(userList);
+    public void getUsersWithValidToken() throws Exception {
+        String email = "test@example.com";
+        String password = "123";
+        User registeredUser = User.builder().email(email).password(password).role(Role.ADMIN).build();
+        String token = jwtService.generateToken(registeredUser);
+        when(userDetailsService.loadUserByUsername(email)).thenReturn(registeredUser);
 
-        // When
-        ResponseEntity<GetUsersResponse> responseEntity = userController.getUsers();
-
-        // Then
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(responseEntity.getBody()).isInstanceOf(GetUsersResponse.class);
-        GetUsersResponse getUsersResponse = responseEntity.getBody();
-        assert getUsersResponse != null;
-        assertThat(getUsersResponse.getUsers()).hasSize(2);
+        User user = User.builder().email("admin@example.com").build();
+        when(userService.findAll()).thenReturn(List.of(user));
+        this.mockMvc.perform(get("/api/v1/user").header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.users[0].company_email").value("admin@example.com"));
     }
+
+    @Test
+    public void getUsersWithInvalidToken() throws Exception {
+        String token = "invalidToken";
+        User user = User.builder().email("admin@example.com").build();
+        when(userService.findAll()).thenReturn(List.of(user));
+        this.mockMvc.perform(get("/api/v1/user").header("Authorization", "Bearer " + token))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
 }

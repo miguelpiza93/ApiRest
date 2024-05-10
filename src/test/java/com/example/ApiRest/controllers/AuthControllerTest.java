@@ -1,89 +1,50 @@
 package com.example.ApiRest.controllers;
 
-import com.example.ApiRest.config.JwtService;
 import com.example.ApiRest.dto.auth.authenticate.AuthRequest;
-import com.example.ApiRest.dto.auth.authenticate.AuthResponse;
-import com.example.ApiRest.dto.auth.register.PhoneRequest;
 import com.example.ApiRest.dto.auth.register.RegisterRequest;
-import com.example.ApiRest.dto.auth.register.RegisterResponse;
-import com.example.ApiRest.entities.User;
 import com.example.ApiRest.services.authentication.AuthenticationService;
-import com.example.ApiRest.services.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class AuthControllerTest {
 
-    @TestConfiguration
-    static class AuthControllerTestContextConfiguration {
-
-        @Bean
-        public JwtService jwtService() {
-            return mock(JwtService.class);
-        }
-
-        @Bean
-        public AuthenticationService authenticationService() {
-            return mock(AuthenticationService.class);
-        }
-
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return mock(PasswordEncoder.class);
-        }
-    }
-
     @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private AuthenticationService authenticationService;
 
-    @Autowired
-    private AuthController authController;
-
     @Test
-    void testAuthenticateSuccessful() {
-        // Given
-        AuthRequest authRequest = mock(AuthRequest.class);
-        when(authenticationService.authenticate(authRequest)).thenReturn("fake-token");
-
-        // When
-        ResponseEntity<?> responseEntity = authController.authenticate(authRequest);
-
-        // Then
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertInstanceOf(AuthResponse.class, responseEntity.getBody());
-        AuthResponse authResponse = (AuthResponse) responseEntity.getBody();
-        assertNotNull(authResponse.getToken());
+    void testAuthenticateSuccessful() throws Exception {
+        String json = "{\"username\":\"admin\",\"password\":\"admin\"}";
+        when(authenticationService.authenticate(any(AuthRequest.class))).thenReturn("token");
+        this.mockMvc.perform(post("/api/v1/auth/authenticate")
+                        .content(json).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(content().string(containsString("token")));
     }
 
     @Test
     void testRegisterUserSuccessful() throws Exception {
-        // Given
-        RegisterRequest registerRequest = mock(RegisterRequest.class);
-        when(authenticationService.register(registerRequest)).thenReturn("fake-token");
-
-        // When
-        ResponseEntity<Object> responseEntity = authController.registerUser(registerRequest);
-
-        // Then
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertInstanceOf(RegisterResponse.class, responseEntity.getBody());
-        RegisterResponse registerResponse = (RegisterResponse) responseEntity.getBody();
-        assertNotNull(registerResponse.getToken());
+        String json = "{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"password\":\"Qwerty1\"}";
+        when(authenticationService.register(any(RegisterRequest.class))).thenReturn("token");
+        this.mockMvc.perform(post("/api/v1/auth/register")
+                        .content(json).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print()).andExpect(status().isCreated())
+                .andExpect(content().string(containsString("token")));
     }
 }
