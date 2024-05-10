@@ -1,3 +1,5 @@
+[![Deployment Pipeline](https://github.com/miguelpiza93/ApiRest/actions/workflows/pipeline.yml/badge.svg)](https://github.com/miguelpiza93/ApiRest/actions/workflows/pipeline.yml)
+
 # API REST con Spring Boot y Docker
 
 Esta es una aplicación de ejemplo que demuestra cómo ejecutar una API REST desarrollada con Spring Boot utilizando Docker.
