@@ -60,7 +60,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    CommandLineRunner initDataBase(UserRepository userRepository) {
+    CommandLineRunner initDataBase(UserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
             Phone phone = Phone.builder()
                     .number("2345234")
@@ -73,7 +73,7 @@ public class ApplicationConfig {
                     .role(Role.ADMIN)
                     .email("admin@test.com")
                     .phones(new ArrayList<>())
-                    .password("$2a$10$kW4x5fPED6ljR0kRdk611e9XjM3AAu34JmfanlySpjgGWlW2wiWDO")
+                    .password(encoder.encode("123"))
                     .build();
             phone.setUser(user);
             user.getPhones().add(phone);
