@@ -9,7 +9,7 @@ on:
       - master
     types:
       - opened
-      - synchronize 
+      - synchronize
 
 jobs:
   deploy:
