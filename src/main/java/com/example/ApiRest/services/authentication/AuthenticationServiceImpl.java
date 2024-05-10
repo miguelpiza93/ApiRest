@@ -69,6 +69,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new Exception("La contraseña es un campo requerido");
         }
 
+        if(body.getRole() == null){
+            throw new Exception("El rol es un campo requerido");
+        }
+
         Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(body.getEmail());
         if(!matcher.find()){
