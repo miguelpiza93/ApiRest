@@ -21,6 +21,7 @@ public class RegisterRequest {
     private String email;
     private String password;
     private List<PhoneRequest> phones;
+    private Role role;
 
     public User toUserEntity() {
         User user = User.builder()
@@ -28,7 +29,7 @@ public class RegisterRequest {
                 .lastname(this.lastname)
                 .email(this.email)
                 .password(this.password)
-                .role(Role.USER)
+                .role(role)
                 .build();
 
         if(this.phones == null){
