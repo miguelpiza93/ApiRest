@@ -86,6 +86,19 @@ class AuthenticationServiceImplTest {
     }
 
     @Test
+    public void registerWithExistingEmail() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setEmail("user@domain.com");
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("El correo ya está registrado", exception.getMessage());
+    }
+
+    @Test
     public void registerWithInvalidEmail() {
         // Given
         RegisterRequest registerRequest = getRegisterRequest();
