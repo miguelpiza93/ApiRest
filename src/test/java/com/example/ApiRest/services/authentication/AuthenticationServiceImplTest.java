@@ -3,6 +3,7 @@ package com.example.ApiRest.services.authentication;
 import com.example.ApiRest.config.JwtService;
 import com.example.ApiRest.dto.auth.authenticate.AuthRequest;
 import com.example.ApiRest.dto.auth.register.RegisterRequest;
+import com.example.ApiRest.entities.Role;
 import com.example.ApiRest.entities.User;
 import com.example.ApiRest.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -149,11 +150,26 @@ class AuthenticationServiceImplTest {
         assertEquals("La contraseña es un campo requerido", exception.getMessage());
     }
 
+    @Test
+    public void registerWithoutRole() {
+        // Given
+        RegisterRequest registerRequest = getRegisterRequest();
+        registerRequest.setRole(null);
+
+        // When
+        Exception exception = assertThrows(Exception.class, () -> authenticationService.register(registerRequest));
+
+        // Then
+        assertEquals("El rol es un campo requerido", exception.getMessage());
+    }
+
+
     private RegisterRequest getRegisterRequest() {
         return RegisterRequest.builder()
                 .firstname("New")
                 .lastname("User")
                 .email("newuser@test.com")
+                .role(Role.USER)
                 .password("Qwertyui1")
                 .build();
     }
